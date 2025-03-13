@@ -1,0 +1,23 @@
+[gerrit]
+    basePath = git
+    serverId = gerrit
+    canonicalWebUrl = ${GERRIT_WEBURL}
+
+[httpd]
+    listenUrl = proxy-http://*:${GERRIT_CONTAINER_HTTP_PORT}
+    filterXForwardedFor = true
+
+[auth]
+    type = HTTP
+    httpHeader = REMOTE_USER
+    loginUrl = ${GERRIT_WEBURL}login
+    trustXForwardedFor = true
+
+[sshd]
+    listenAddress = *:29418
+
+[container]
+    user = gerrit
+
+[receive]
+    enableSignedPush = false

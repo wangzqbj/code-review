@@ -1,0 +1,36 @@
+server {
+    listen ${NGINX_CONTAINER_PORT} default_server;
+    server_name _;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    # 处理没有尾斜线的 /gerrit 请求
+    location = /gerrit {
+        return 301 $scheme://$host:${PORT}/gerrit/;
+    }
+
+    location /gerrit/ {
+        auth_basic "Gerrit Code Review";
+        auth_basic_user_file /etc/nginx/htpasswd;
+
+        proxy_pass http://gerrit:${GERRIT_CONTAINER_HTTP_PORT}/;
+        
+        # 添加认证头
+        proxy_set_header REMOTE_USER $remote_user;
+        
+        proxy_set_header Host $host:${PORT};
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+        
+        proxy_buffer_size 16k;
+        proxy_buffers 4 16k;
+        
+        proxy_redirect http://gerrit:${GERRIT_CONTAINER_HTTP_PORT}/ $scheme://$host:${PORT}/gerrit/;
+    }
+}

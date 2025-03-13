@@ -1,0 +1,34 @@
+version: '3'
+services:
+  gerrit:
+    image: gerritcodereview/gerrit
+    container_name: gerrit
+    environment:
+      - CANONICAL_WEB_URL=${GERRIT_WEBURL}
+    ports:
+      - "${GERRIT_SSH_PORT}:${GERRIT_CONTAINER_SSH_PORT}"
+    volumes:
+      - ./gerrit/etc:/var/gerrit/etc
+    networks:
+      - gerrit-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "${PORT}:${NGINX_CONTAINER_PORT}"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/htpasswd/.htpasswd:/etc/nginx/htpasswd
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - gerrit
+    networks:
+      - gerrit-network
+    restart: unless-stopped
+
+networks:
+  gerrit-network:
+    driver: bridge
+
