@@ -4,7 +4,7 @@
     canonicalWebUrl = ${GERRIT_WEBURL}
 
 [httpd]
-    listenUrl = proxy-http://*:${GERRIT_CONTAINER_HTTP_PORT}
+    listenUrl = proxy-http://*:${GERRIT_CONTAINER_HTTP_PORT}/
     filterXForwardedFor = true
 
 [auth]

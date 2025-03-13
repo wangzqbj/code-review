@@ -7,6 +7,10 @@ export PORT=8090
 export GERRIT_SSH_PORT=29418
 export GERRIT_WEBURL="http://${HOST}:${PORT}/gerrit/"
 
+# Gitlab 配置
+export GITLAB_SSH_PORT=2222
+export GITLAB_WEBURL="http://${HOST}:${PORT}/gitlab/"
+
 
 # Container 内部端口
 export NGINX_CONTAINER_PORT=80

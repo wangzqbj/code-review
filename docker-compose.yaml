@@ -13,6 +13,30 @@ services:
       - gerrit-network
     restart: unless-stopped
 
+  gitlab:
+    image: gitlab/gitlab-ce
+    container_name: gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # 预配置gitlab.rb中的配置项，每行一项
+        external_url '${GITLAB_WEBURL}'
+        gitlab_rails['gitlab_shell_ssh_host'] = '${HOST}'
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
+        puma['worker_processes'] = 2
+        sidekiq['concurrency'] = 10
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+    ports:
+      - '${GITLAB_SSH_PORT}:22'
+    volumes:
+      - './config:/etc/gitlab'
+      - './logs:/var/log/gitlab'
+      - './data:/var/opt/gitlab'
+    shm_size: '256m'
+    networks:
+      - gerrit-network
+    restart: unless-stopped
+
   nginx:
     image: nginx
     container_name: nginx
@@ -24,6 +48,7 @@ services:
       - ./nginx/logs:/var/log/nginx
     depends_on:
       - gerrit
+      - gitlab
     networks:
       - gerrit-network
     restart: unless-stopped
